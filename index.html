@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>One Piece Ultimate Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Noto+Sans+Thai:wght@300;400;600;700&family=Pirata+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #f5c842;
+  --gold-dark: #c9920a;
+  --gold-light: #ffe896;
+  --red: #c0392b;
+  --red-dark: #7b1a12;
+  --navy: #080c18;
+  --navy-mid: #0f1623;
+  --navy-light: #1a2540;
+  --teal: #00c9c8;
+  --white: #f0ecd8;
+  --logia: #3b82f6;
+  --mythical: #a855f7;
+  --ancient: #f97316;
+  --zoan: #22c55e;
+  --paramecia: #ef4444;
+  --supreme: #f5c842;
+  --great: #e2e8f0;
+  --skillful: #fb923c;
+  --good: #94a3b8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--navy);
+  font-family:'Noto Sans Thai',sans-serif;
+  color:var(--white);
+  position:relative;
+  overflow:hidden;
+}
+
+/* BG */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse at 15% 15%,rgba(0,120,180,0.12) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 85%,rgba(120,0,30,0.10) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 15%,rgba(80,0,120,0.08) 0%,transparent 50%);
+  pointer-events:none;z-index:0;
+}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;border-radius:50%;animation:twinkle var(--dur,3s) ease-in-out infinite;animation-delay:var(--delay,0s);opacity:0}
+@keyframes twinkle{0%,100%{opacity:0}50%{opacity:var(--b,.7)}}
+
+/* LAYOUT */
+.app{
+  position:relative;z-index:1;
+  max-width:430px;margin:0 auto;
+  height:100vh;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+
+/* TOP NAV TABS */
+.nav-tabs{
+  display:flex;
+  background:rgba(8,12,24,0.95);
+  border-bottom:1px solid rgba(245,200,66,0.2);
+  flex-shrink:0;
+}
+.nav-tab{
+  flex:1;padding:12px 4px 10px;
+  text-align:center;
+  cursor:pointer;
+  font-size:11px;font-weight:700;
+  letter-spacing:0.5px;
+  color:rgba(240,236,216,0.4);
+  border-bottom:2px solid transparent;
+  transition:all .25s;
+  line-height:1.3;
+}
+.nav-tab.active{
+  color:var(--gold);
+  border-bottom-color:var(--gold);
+  background:rgba(245,200,66,0.05);
+}
+.nav-tab span{display:block;font-size:18px;margin-bottom:2px}
+
+/* SCREENS */
+.screen{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0}
+.screen.active{display:flex}
+
+/* HEADER */
+.header{
+  text-align:center;padding:14px 16px 8px;flex-shrink:0;
+  position:relative;
+}
+.header::after{content:'';display:block;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin-top:10px}
+.skull{font-size:30px;filter:drop-shadow(0 0 10px rgba(245,200,66,.7));animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.title{font-family:'Pirata One',cursive;font-size:22px;color:var(--gold);text-shadow:0 0 18px rgba(245,200,66,.5);letter-spacing:2px;margin-top:4px}
+.subtitle{font-size:10px;color:var(--teal);letter-spacing:3px;text-transform:uppercase;margin-top:2px}
+
+/* SCROLL AREA */
+.scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 0 20px}
+.scroll-area::-webkit-scrollbar{width:3px}
+.scroll-area::-webkit-scrollbar-thumb{background:rgba(245,200,66,0.3);border-radius:3px}
+
+/* PROGRESS */
+.progress-bar{display:flex;justify-content:center;gap:6px;padding:8px 16px 4px;flex-shrink:0}
+.progress-dot{width:24px;height:4px;border-radius:2px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);transition:all .4s}
+.progress-dot.done{background:var(--gold-dark);border-color:var(--gold);box-shadow:0 0 6px rgba(245,200,66,.5)}
+.progress-dot.active{background:var(--teal);border-color:var(--teal);box-shadow:0 0 8px rgba(0,201,200,.7);animation:pdot 1.2s ease-in-out infinite}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:.5}}
+
+.stage-label{text-align:center;padding:4px 16px 6px;flex-shrink:0}
+.stage-num{font-size:10px;color:var(--teal);letter-spacing:3px;text-transform:uppercase}
+.stage-name{font-family:'Pirata One',cursive;font-size:18px;color:var(--gold-light);text-shadow:0 0 12px rgba(245,200,66,.35);margin-top:1px}
+
+/* WHEEL */
+.wheel-wrap{display:flex;flex-direction:column;align-items:center;padding:4px 16px 8px;flex-shrink:0}
+.wheel-frame{position:relative;width:260px;height:260px}
+.wheel-frame::before{
+  content:'';position:absolute;inset:-6px;border-radius:50%;
+  background:conic-gradient(from 0deg,var(--gold-dark),var(--gold),var(--gold-dark),var(--gold),var(--gold-dark));
+  z-index:-1;filter:blur(1px);
+}
+canvas.wcanvas{border-radius:50%;display:block;filter:drop-shadow(0 0 16px rgba(245,200,66,.25))}
+.pointer{position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:28px solid var(--gold);filter:drop-shadow(0 3px 6px rgba(245,200,66,.8));z-index:10;animation:pglow 2s ease-in-out infinite}
+@keyframes pglow{0%,100%{filter:drop-shadow(0 3px 6px rgba(245,200,66,.8))}50%{filter:drop-shadow(0 3px 14px rgba(245,200,66,1))}}
+.wheel-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:radial-gradient(circle,var(--gold-light),var(--gold-dark));border:3px solid var(--navy);box-shadow:0 0 0 2px var(--gold),0 0 16px rgba(245,200,66,.5),inset 0 1px 3px rgba(255,255,255,.4);z-index:10;display:flex;align-items:center;justify-content:center;font-size:16px}
+
+/* SPIN BTN */
+.spin-btn{
+  margin-top:10px;padding:13px 40px;
+  background:linear-gradient(135deg,var(--gold-dark),var(--gold),var(--gold-light),var(--gold));
+  border:none;border-radius:50px;
+  font-family:'Pirata One',cursive;font-size:20px;color:var(--navy);
+  cursor:pointer;
+  box-shadow:0 4px 18px rgba(245,200,66,.35),0 2px 4px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.4);
+  transition:all .2s;letter-spacing:2px;position:relative;overflow:hidden;
+}
+.spin-btn:active{transform:scale(.95)}
+.spin-btn:disabled{opacity:.5;cursor:not-allowed}
+.spin-btn::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 30%,rgba(255,255,255,.25) 50%,transparent 70%);transform:rotate(45deg) translate(-100%,-100%)}
+.spin-btn:not(:disabled):hover::before{animation:shine .6s forwards}
+@keyframes shine{to{transform:rotate(45deg) translate(100%,100%)}}
+
+/* RESULT CARD */
+.result-card{
+  margin:8px 16px 0;
+  background:linear-gradient(135deg,rgba(26,37,64,.95),rgba(15,22,35,.95));
+  border:1px solid rgba(245,200,66,.25);border-radius:14px;
+  padding:14px 16px;
+  box-shadow:0 0 24px rgba(245,200,66,.08),inset 0 1px 0 rgba(245,200,66,.08);
+  position:relative;overflow:hidden;
+  opacity:0;transform:translateY(16px) scale(.97);
+  transition:all .4s cubic-bezier(.175,.885,.32,1.275);
+  flex-shrink:0;
+}
+.result-card.show{opacity:1;transform:translateY(0) scale(1)}
+.result-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.result-label{font-size:10px;color:var(--teal);letter-spacing:3px;text-transform:uppercase}
+.result-value{font-family:'Pirata One',cursive;font-size:22px;color:var(--gold-light);text-shadow:0 0 12px rgba(245,200,66,.45);margin-top:3px;line-height:1.2}
+.result-sub{font-size:11px;color:rgba(245,200,66,.6);margin-top:1px}
+.result-desc{font-size:11px;color:rgba(240,236,216,.55);margin-top:5px;line-height:1.5}
+.rarity-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;margin-top:6px}
+
+/* NEXT BTN */
+.next-btn{
+  margin:8px 16px 0;padding:13px;width:calc(100% - 32px);
+  background:linear-gradient(135deg,var(--teal),#006f6e);
+  border:none;border-radius:50px;
+  font-family:'Noto Sans Thai',sans-serif;font-size:15px;font-weight:700;
+  color:var(--navy);cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,201,200,.3);
+  transition:all .2s;display:none;flex-shrink:0;
+}
+.next-btn.show{display:block}
+.next-btn:active{transform:scale(.97)}
+
+/* SUMMARY */
+.summary-wrap{padding:8px 16px 16px}
+.summary-title{font-family:'Pirata One',cursive;font-size:22px;color:var(--gold);text-align:center;text-shadow:0 0 16px rgba(245,200,66,.5);margin-bottom:12px}
+.summary-grid{display:flex;flex-direction:column;gap:7px}
+.summary-item{
+  background:linear-gradient(135deg,rgba(26,37,64,.9),rgba(15,22,35,.9));
+  border:1px solid rgba(245,200,66,.18);border-radius:10px;
+  padding:10px 14px;display:flex;align-items:center;gap:10px;
+  opacity:0;transform:translateX(-16px);transition:all .4s ease;
+}
+.summary-item.appear{opacity:1;transform:translateX(0)}
+.summary-icon{font-size:18px;min-width:26px;text-align:center}
+.summary-info{flex:1}
+.summary-cat{font-size:9px;color:var(--teal);letter-spacing:2px;text-transform:uppercase}
+.summary-val{font-family:'Pirata One',cursive;font-size:15px;color:var(--gold-light);margin-top:1px}
+.summary-badge{padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;white-space:nowrap}
+
+/* FRUIT / SWORD screen specifics */
+.mode-selector{
+  display:flex;gap:8px;padding:8px 16px 4px;flex-shrink:0;
+}
+.mode-btn{
+  flex:1;padding:10px 8px;border-radius:10px;border:none;cursor:pointer;
+  font-family:'Noto Sans Thai',sans-serif;font-size:12px;font-weight:700;
+  transition:all .25s;
+}
+.mode-btn.fruit-btn{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.mode-btn.fruit-btn.active{background:rgba(239,68,68,.3);box-shadow:0 0 12px rgba(239,68,68,.3)}
+.mode-btn.sword-btn{background:rgba(226,232,240,.1);color:#e2e8f0;border:1px solid rgba(226,232,240,.2)}
+.mode-btn.sword-btn.active{background:rgba(226,232,240,.2);box-shadow:0 0 12px rgba(226,232,240,.2)}
+
+/* FILTER CHIPS */
+.filter-chips{
+  display:flex;gap:5px;padding:4px 16px 6px;overflow-x:auto;flex-shrink:0;
+}
+.filter-chips::-webkit-scrollbar{display:none}
+.chip{
+  padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;
+  border:none;cursor:pointer;white-space:nowrap;transition:all .2s;
+  letter-spacing:.5px;
+}
+.chip.all{background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.3)}
+.chip.all.active{background:rgba(245,200,66,.3);box-shadow:0 0 8px rgba(245,200,66,.3)}
+.chip.logia{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.chip.logia.active{background:rgba(59,130,246,.3)}
+.chip.mythical{background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.3)}
+.chip.mythical.active{background:rgba(168,85,247,.3)}
+.chip.ancient{background:rgba(249,115,22,.15);color:#fdba74;border:1px solid rgba(249,115,22,.3)}
+.chip.ancient.active{background:rgba(249,115,22,.3)}
+.chip.zoan{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+.chip.zoan.active{background:rgba(34,197,94,.3)}
+.chip.paramecia{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.chip.paramecia.active{background:rgba(239,68,68,.3)}
+.chip.supreme{background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.3)}
+.chip.supreme.active{background:rgba(245,200,66,.3)}
+.chip.great{background:rgba(226,232,240,.12);color:#e2e8f0;border:1px solid rgba(226,232,240,.25)}
+.chip.great.active{background:rgba(226,232,240,.25)}
+.chip.skillful{background:rgba(251,146,60,.15);color:#fdba74;border:1px solid rgba(251,146,60,.3)}
+.chip.skillful.active{background:rgba(251,146,60,.3)}
+.chip.good{background:rgba(148,163,184,.12);color:#94a3b8;border:1px solid rgba(148,163,184,.25)}
+.chip.good.active{background:rgba(148,163,184,.25)}
+
+/* SPIN COUNT */
+.spin-info{text-align:center;font-size:10px;color:rgba(240,236,216,.4);padding:2px 0 4px;flex-shrink:0}
+
+/* HISTORY */
+.history-wrap{padding:4px 16px 0;flex-shrink:0}
+.history-title{font-size:10px;color:rgba(240,236,216,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.history-list{display:flex;flex-wrap:wrap;gap:4px}
+.history-chip{
+  padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:rgba(240,236,216,.6);
+}
+
+/* RESET BTN */
+.reset-btn{
+  position:fixed;bottom:20px;right:16px;
+  width:46px;height:46px;border-radius:50%;
+  background:linear-gradient(135deg,var(--red-dark),var(--red));
+  border:2px solid rgba(255,100,80,.35);color:#fff;font-size:18px;
+  cursor:pointer;box-shadow:0 4px 14px rgba(192,57,43,.45);
+  transition:all .2s;z-index:100;display:flex;align-items:center;justify-content:center;
+}
+.reset-btn:active{transform:scale(.9)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:linear-gradient(135deg,var(--navy-light),var(--navy-mid));border:1px solid rgba(245,200,66,.35);border-radius:18px;padding:24px 20px;max-width:300px;width:100%;text-align:center;transform:scale(.85);transition:transform .3s cubic-bezier(.175,.885,.32,1.275)}
+.modal-overlay.open .modal{transform:scale(1)}
+.modal-icon{font-size:38px;margin-bottom:10px}
+.modal-title{font-family:'Pirata One',cursive;font-size:20px;color:var(--gold);margin-bottom:6px}
+.modal-text{font-size:13px;color:rgba(240,236,216,.65);line-height:1.6;margin-bottom:18px}
+.modal-btns{display:flex;gap:10px}
+.modal-btn{flex:1;padding:11px;border-radius:10px;border:none;font-family:'Noto Sans Thai',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.modal-btn.cancel{background:rgba(255,255,255,.08);color:var(--white);border:1px solid rgba(255,255,255,.15)}
+.modal-btn.confirm{background:linear-gradient(135deg,var(--red-dark),var(--red));color:#fff;box-shadow:0 4px 10px rgba(192,57,43,.35)}
+.modal-btn:active{transform:scale(.95)}
+
+/* BONUS BANNER */
+.bonus-banner{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;border-radius:12px;
+  border:1px solid rgba(245,200,66,0.3);
+  background:rgba(245,200,66,0.06);
+  animation:bonusPop .5s cubic-bezier(.175,.885,.32,1.275) both;
+}
+@keyframes bonusPop{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.bonus-icon{font-size:24px;flex-shrink:0}
+.bonus-text{flex:1;min-width:0}
+.bonus-title{font-family:'Pirata One',cursive;font-size:15px;font-weight:700}
+.bonus-sub{font-size:10px;color:rgba(240,236,216,.5);margin-top:2px;line-height:1.4}
+.bonus-btn{
+  flex-shrink:0;padding:8px 14px;border-radius:20px;border:none;
+  font-family:'Noto Sans Thai',sans-serif;font-size:12px;font-weight:700;
+  color:#000;cursor:pointer;transition:all .2s;
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+.bonus-btn:active{transform:scale(.93)}
+.firework-container{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.particle{position:absolute;border-radius:50%;animation:burst var(--dur,1s) forwards;animation-delay:var(--delay,0s)}
+@keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="firework-container" id="fireworks"></div>
+
+<div class="modal-overlay" id="resetModal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">รีเซ็ตทั้งหมด?</div>
+    <div class="modal-text">ข้อมูลที่สุ่มไว้ทั้งหมดจะหายไป แน่ใจหรือไม่?</div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">ยกเลิก</button>
+      <button class="modal-btn confirm" onclick="confirmReset()">รีเซ็ตเลย!</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <!-- NAV -->
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('char')"><span>🏴‍☠️</span>ตัวละคร</div>
+    <div class="nav-tab" onclick="switchTab('fruit')"><span>🍎</span>ผลปีศาจ</div>
+    <div class="nav-tab" onclick="switchTab('sword')"><span>⚔️</span>ดาบ</div>
+  </div>
+
+  <!-- ===== TAB 1: CHARACTER ===== -->
+  <div class="screen active" id="screen-char">
+    <div class="header">
+      <div class="skull">☠️</div>
+      <div class="title">ONE PIECE</div>
+      <div class="subtitle">สร้างตัวละครของคุณ</div>
+    </div>
+
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="stage-label">
+      <div class="stage-num" id="stageNum">ขั้นที่ 1 / 7</div>
+      <div class="stage-name" id="stageName">🧬 เผ่าพันธุ์</div>
+    </div>
+
+    <div class="scroll-area">
+      <div class="wheel-wrap">
+        <div class="wheel-frame">
+          <div class="pointer"></div>
+          <canvas class="wcanvas" id="charWheel" width="260" height="260"></canvas>
+          <div class="wheel-hub">⚓</div>
+        </div>
+        <button class="spin-btn" id="charSpinBtn" onclick="charSpin()">🎲 หมุน!</button>
+      </div>
+
+      <div class="result-card" id="charResult">
+        <div class="result-label" id="charResultLabel">ผลลัพธ์</div>
+        <div class="result-value" id="charResultValue">-</div>
+        <div class="result-desc" id="charResultDesc"></div>
+        <div class="rarity-badge" id="charRarityBadge"></div>
+      </div>
+
+      <button class="next-btn" id="charNextBtn" onclick="charNext()">ถัดไป →</button>
+
+      <!-- Summary (shown at end) -->
+      <div id="charSummary" style="display:none">
+        <div class="summary-wrap">
+          <div class="summary-title">⚔️ ตัวละครของคุณ ⚔️</div>
+          <div class="summary-grid" id="summaryGrid"></div>
+          <div id="summaryBonus" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
+          <div style="text-align:center;margin-top:16px">
+            <button class="spin-btn" onclick="charReset()" style="font-size:15px;padding:12px 32px">🔄 สร้างใหม่</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 2: DEVIL FRUIT ===== -->
+  <div class="screen" id="screen-fruit">
+    <div class="header">
+      <div class="skull" style="font-size:24px">🍎</div>
+      <div class="title" style="font-size:18px">ผลปีศาจ</div>
+      <div class="subtitle">Devil Fruit Spinner</div>
+    </div>
+
+    <div class="filter-chips" id="fruitChips">
+      <button class="chip all active" onclick="setFruitFilter('all',this)">ทั้งหมด</button>
+      <button class="chip logia" onclick="setFruitFilter('logia',this)">โลเกีย</button>
+      <button class="chip mythical" onclick="setFruitFilter('mythical',this)">อสูรมายา</button>
+      <button class="chip ancient" onclick="setFruitFilter('ancient',this)">โบราณ</button>
+      <button class="chip zoan" onclick="setFruitFilter('zoan',this)">โซออน</button>
+      <button class="chip paramecia" onclick="setFruitFilter('paramecia',this)">พารามีเซีย</button>
+    </div>
+
+    <div class="scroll-area">
+      <div class="wheel-wrap">
+        <div class="wheel-frame">
+          <div class="pointer"></div>
+          <canvas class="wcanvas" id="fruitWheel" width="260" height="260"></canvas>
+          <div class="wheel-hub">🍎</div>
+        </div>
+        <button class="spin-btn" id="fruitSpinBtn" onclick="fruitSpin()">🎲 หมุน!</button>
+      </div>
+
+      <div class="spin-info" id="fruitSpinInfo">รวม 0 ผล | หมุนแล้ว 0 ครั้ง</div>
+
+      <div class="result-card" id="fruitResult">
+        <div class="result-label" id="fruitResultLabel">ผลปีศาจ</div>
+        <div class="result-value" id="fruitResultValue">-</div>
+        <div class="result-sub" id="fruitResultSub"></div>
+        <div class="result-desc" id="fruitResultDesc"></div>
+        <div class="rarity-badge" id="fruitRarityBadge"></div>
+      </div>
+
+      <div class="history-wrap" id="fruitHistoryWrap" style="display:none">
+        <div class="history-title">ประวัติการสุ่ม</div>
+        <div class="history-list" id="fruitHistory"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 3: SWORD ===== -->
+  <div class="screen" id="screen-sword">
+    <div class="header">
+      <div class="skull" style="font-size:24px">⚔️</div>
+      <div class="title" style="font-size:18px">ดาบ Meito</div>
+      <div class="subtitle">Sword Spinner</div>
+    </div>
+
+    <div class="filter-chips" id="swordChips">
+      <button class="chip all active" onclick="setSwordFilter('all',this)">ทั้งหมด</button>
+      <button class="chip supreme" onclick="setSwordFilter('supreme',this)">Supreme</button>
+      <button class="chip great" onclick="setSwordFilter('great',this)">Great</button>
+      <button class="chip skillful" onclick="setSwordFilter('skillful',this)">Skillful</button>
+      <button class="chip good" onclick="setSwordFilter('good',this)">Good/อื่นๆ</button>
+    </div>
+
+    <div class="scroll-area">
+      <div class="wheel-wrap">
+        <div class="wheel-frame">
+          <div class="pointer"></div>
+          <canvas class="wcanvas" id="swordWheel" width="260" height="260"></canvas>
+          <div class="wheel-hub">⚔️</div>
+        </div>
+        <button class="spin-btn" id="swordSpinBtn" onclick="swordSpin()">🎲 หมุน!</button>
+      </div>
+
+      <div class="spin-info" id="swordSpinInfo">รวม 0 เล่ม | หมุนแล้ว 0 ครั้ง</div>
+
+      <div class="result-card" id="swordResult">
+        <div class="result-label" id="swordResultLabel">ดาบ</div>
+        <div class="result-value" id="swordResultValue">-</div>
+        <div class="result-sub" id="swordResultSub"></div>
+        <div class="result-desc" id="swordResultDesc"></div>
+        <div class="rarity-badge" id="swordRarityBadge"></div>
+      </div>
+
+      <div class="history-wrap" id="swordHistoryWrap" style="display:none">
+        <div class="history-title">ประวัติการสุ่ม</div>
+        <div class="history-list" id="swordHistory"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="reset-btn" onclick="openModal()" title="รีเซ็ต">🔄</button>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+const CHAR_STAGES = [
+  { name:'เผ่าพันธุ์', icon:'🧬', items:[
+    {label:'มนุษย์',w:70,color:'#4a90d9',desc:'เผ่าพันธุ์ทั่วไป พบเจอได้ทุกที่',rarity:'ปกติ',rc:'#4a90d9'},
+    {label:'มนุษย์เงือก',w:7.5,color:'#00b4d8',desc:'ว่ายน้ำเร็วกว่ามนุษย์ 10 เท่า',rarity:'หายาก',rc:'#00b4d8'},
+    {label:'มิงค์',w:7.5,color:'#7b2d8b',desc:'มีพลัง Sulong ในคืนพระจันทร์เต็มดวง',rarity:'หายาก',rc:'#7b2d8b'},
+    {label:'คนยักษ์',w:2.5,color:'#c0392b',desc:'ยักษ์ใหญ่จาก Elbaf แรงมหาศาล',rarity:'หายากมาก',rc:'#c0392b'},
+    {label:'ลูนาเรีย',w:2.5,color:'#f39c12',desc:'เผ่าพันธุ์แห่งนรก ทนไฟและสร้างเปลวไฟ',rarity:'หายากมาก',rc:'#f39c12'},
+    {label:'สามตา',w:3.33,color:'#8e44ad',desc:'ตาที่สามปลุกพลังพิเศษได้',rarity:'พิเศษ',rc:'#8e44ad'},
+    {label:'แขนยาว',w:3.33,color:'#27ae60',desc:'แขนยาวพิเศษ ใช้ฮาคิได้ดีมาก',rarity:'พิเศษ',rc:'#27ae60'},
+    {label:'ขายาว',w:3.33,color:'#e67e22',desc:'ขายาว ความเร็วและพิสัยสูง',rarity:'พิเศษ',rc:'#e67e22'},
+  ]},
+  { name:'พลังผลปีศาจ', icon:'🍎', items:[
+    {label:'ไม่มีพลัง',w:50,color:'#636e72',desc:'ว่ายน้ำได้! พึ่งกายภาพและทักษะ',rarity:'ปกติ',rc:'#636e72'},
+    {label:'พารามีเซีย',w:25,color:'#ef4444',desc:'เปลี่ยนแปลงร่างกายหรือสิ่งแวดล้อม',rarity:'หายาก',rc:'#ef4444'},
+    {label:'โซออนทั่วไป',w:15,color:'#f39c12',desc:'แปลงร่างเป็นสัตว์ เพิ่มพลังกาย',rarity:'หายาก',rc:'#f39c12'},
+    {label:'โลเกีย',w:7,color:'#3b82f6',desc:'กลายเป็นธาตุ ทนการโจมตีปกติ',rarity:'หายากมาก',rc:'#3b82f6'},
+    {label:'โซออนอสูรมายา',w:3,color:'#a855f7',desc:'พลังเทพ เหนือกว่าโซออนทั่วไป',rarity:'ตำนาน',rc:'#a855f7'},
+  ]},
+  { name:'อาวุธประจำตัว', icon:'⚔️', items:[
+    {label:'ไม่มีอาวุธ',w:35,color:'#636e72',desc:'นักสู้มือเปล่า เน้นหมัด/เตะ',rarity:'ปกติ',rc:'#636e72'},
+    {label:'ดาบทั่วไป',w:15,color:'#b2bec3',desc:'ดาบธรรมดา ใช้งานทั่วไป',rarity:'ปกติ',rc:'#b2bec3'},
+    {label:'อาวุธหนัก',w:15,color:'#e17055',desc:'ขวาน/ค้อน พลังทำลายสูง',rarity:'ปกติ',rc:'#e17055'},
+    {label:'อาวุธยิง',w:20,color:'#00b894',desc:'ปืน/ธนู โจมตีระยะไกล',rarity:'พื้นฐาน',rc:'#00b894'},
+    {label:'ดาบเลื่องชื่อ',w:7.5,color:'#fdcb6e',desc:'ดาบ Meito มีชื่อเสียงระดับโลก',rarity:'หายาก',rc:'#fdcb6e'},
+    {label:'เทคโนโลยีไซบอร์ก',w:7.5,color:'#74b9ff',desc:'ดัดแปลงร่างกาย/อาวุธเทคโนโลยีสูง',rarity:'หายาก',rc:'#74b9ff'},
+  ]},
+  { name:'ระดับทักษะ', icon:'🥷', items:[
+    {label:'ใช้มั่วๆ',w:20,color:'#b2bec3',desc:'ไร้ทักษะ ต่อสู้ตามสัญชาตญาณ',rarity:'ปกติ',rc:'#b2bec3'},
+    {label:'ระดับเริ่มต้น',w:30,color:'#55efc4',desc:'ผ่านการฝึกขั้นต้น ถือว่าใช้เป็น',rarity:'ปกติ',rc:'#55efc4'},
+    {label:'ระดับนักรบ',w:30,color:'#74b9ff',desc:'คล่องแคล่ว ผ่านประสบการณ์มาก',rarity:'พิเศษ',rc:'#74b9ff'},
+    {label:'ระดับปรมาจารย์',w:15,color:'#fdcb6e',desc:'ยอดฝีมือ เป็นที่รู้จักในโลกใต้',rarity:'หายาก',rc:'#fdcb6e'},
+    {label:'ระดับตำนาน',w:5,color:'#e17055',desc:'ไร้เทียมทาน ระดับสี่จักรพรรดิ',rarity:'ตำนาน',rc:'#e17055'},
+  ]},
+  { name:'ฮาคิ', icon:'👁️', items:[
+    {label:'ไม่มีฮาคิ',w:55,color:'#636e72',desc:'พึ่งทักษะล้วนๆ ไม่มีพลังฮาคิ',rarity:'ปกติ',rc:'#636e72'},
+    {label:'ฮาคิสังเกต',w:15,color:'#74b9ff',desc:'รับรู้ความรู้สึก มองเห็นสิ่งซ่อน',rarity:'พิเศษ',rc:'#74b9ff'},
+    {label:'ฮาคิเกราะ',w:15,color:'#fdcb6e',desc:'เสริมความแข็งแกร่งโจมตีและป้องกัน',rarity:'พิเศษ',rc:'#fdcb6e'},
+    {label:'สังเกต+เกราะ',w:10,color:'#00b894',desc:'มีสองประเภท นักสู้ที่แข็งแกร่ง',rarity:'หายาก',rc:'#00b894'},
+    {label:'ครบ 3 ฮาคิ',w:5,color:'#e17055',desc:'รวมฮาคิราชันย์ ระดับสี่จักรพรรดิ!',rarity:'ตำนาน',rc:'#e17055'},
+  ]},
+  { name:'ระดับฮาคิ', icon:'⚡', items:[
+    {label:'ระดับตื่นขึ้น',w:50,color:'#74b9ff',desc:'เพิ่งปลุกฮาคิ ควบคุมยังไม่ดี',rarity:'ปกติ',rc:'#74b9ff'},
+    {label:'ระดับกลาง',w:35,color:'#55efc4',desc:'ใช้ฮาคิคล่อง ควบคุมได้ดี',rarity:'พิเศษ',rc:'#55efc4'},
+    {label:'ระดับขั้นสูง',w:10,color:'#fdcb6e',desc:'ทำลายภายใน/มองเห็นอนาคต',rarity:'หายาก',rc:'#fdcb6e'},
+    {label:'ระดับไร้ขอบเขต',w:5,color:'#e17055',desc:'พลังระดับสี่จักรพรรดิ ไม่มีขีดจำกัด',rarity:'ตำนาน',rc:'#e17055'},
+  ]},
+  { name:'บทบาทและค่าหัว', icon:'💰', items:[
+    {label:'ตัวประกอบ',w:40,color:'#636e72',desc:'ค่าหัว: 0 เบรี ไม่มีใครสนใจ',rarity:'ปกติ',rc:'#636e72'},
+    {label:'โจรสลัดหน้าใหม่',w:30,color:'#74b9ff',desc:'ค่าหัว: 1–50 ล้านเบรี',rarity:'พิเศษ',rc:'#74b9ff'},
+    {label:'รุกกี้ปีศาจ',w:20,color:'#fdcb6e',desc:'ค่าหัว: 100–500 ล้านเบรี',rarity:'หายาก',rc:'#fdcb6e'},
+    {label:'ขุนพล',w:8,color:'#e17055',desc:'ค่าหัว: 1,000 ล้านเบรี+',rarity:'หายากมาก',rc:'#e17055'},
+    {label:'จักรพรรดิ',w:2,color:'#a29bfe',desc:'ค่าหัว: 3,000 ล้านเบรี+',rarity:'ตำนาน',rc:'#a29bfe'},
+  ]},
+];
+
+// ---------- DEVIL FRUITS ----------
+const FRUITS_RAW = [
+  // LOGIA (w per fruit ~1.55, total 17%)
+  {label:'เมระเมระโนมิ',sub:'Mera Mera no Mi — ไฟ',type:'logia',w:1.55,color:'#ef4444',desc:'กลายเป็นเปลวไฟ เจ้าของ: Portgas D. Ace / Sabo'},
+  {label:'ฮิเอะฮิเอะโนมิ',sub:'Hie Hie no Mi — น้ำแข็ง',type:'logia',w:1.55,color:'#93c5fd',desc:'กลายเป็นน้ำแข็ง เจ้าของ: Aokiji'},
+  {label:'โกโรโกโรโนมิ',sub:'Goro Goro no Mi — ฟ้าผ่า',type:'logia',w:1.55,color:'#fde68a',desc:'กลายเป็นฟ้าผ่า เจ้าของ: Enel'},
+  {label:'ซุนะซุนะโนมิ',sub:'Suna Suna no Mi — ทราย',type:'logia',w:1.55,color:'#fbbf24',desc:'กลายเป็นทราย เจ้าของ: Crocodile'},
+  {label:'โมะกุโมะกุโนมิ',sub:'Moku Moku no Mi — ควัน',type:'logia',w:1.55,color:'#d1d5db',desc:'กลายเป็นควัน เจ้าของ: Smoker'},
+  {label:'ยะมิยะมิโนมิ',sub:'Yami Yami no Mi — ความมืด',type:'logia',w:1.55,color:'#4c1d95',desc:'กลายเป็นความมืด เจ้าของ: Blackbeard'},
+  {label:'ปิกะปิกะโนมิ',sub:'Pika Pika no Mi — แสง',type:'logia',w:1.55,color:'#fef08a',desc:'กลายเป็นแสง ความเร็วสูงสุด เจ้าของ: Kizaru'},
+  {label:'นุมะนุมะโนมิ',sub:'Numa Numa no Mi — หนองน้ำ',type:'logia',w:1.55,color:'#65a30d',desc:'กลายเป็นหนองน้ำ เจ้าของ: Caribou'},
+  {label:'กะซุกะซุโนมิ',sub:'Gasu Gasu no Mi — แก๊ส',type:'logia',w:1.55,color:'#a3e635',desc:'กลายเป็นแก๊ส เจ้าของ: Caesar Clown'},
+  {label:'มะกุมะกุโนมิ',sub:'Magu Magu no Mi — แมกมา',type:'logia',w:1.55,color:'#dc2626',desc:'กลายเป็นแมกมา แรงกว่าไฟ เจ้าของ: Akainu'},
+  {label:'โทะโระโทะโระโนมิ',sub:'Toro Toro no Mi — น้ำมัน',type:'logia',w:1.55,color:'#d97706',desc:'กลายเป็นน้ำมัน เจ้าของ: ตัวประกอบ'},
+
+  // MYTHICAL ZOAN (w ~0.625, total 5%)
+  {label:'ฮิโตะฮิโตะโนมิ: นิกะ',sub:'Hito Hito no Mi Model: Nika',type:'mythical',w:0.625,color:'#a855f7',desc:'อสูรมายาแห่งดวงอาทิตย์ ร่างกายยาง เจ้าของ: Luffy'},
+  {label:'ฮิโตะฮิโตะโนมิ: ไดบุตซึ',sub:'Hito Hito no Mi Model: Daibutsu',type:'mythical',w:0.625,color:'#f59e0b',desc:'พระพุทธรูปยักษ์ เจ้าของ: Sengoku'},
+  {label:'อินุอินุโนมิ: โอกุจิโนมาคามิ',sub:'Inu Inu no Mi Model: Okuchi no Makami',type:'mythical',w:0.625,color:'#e2e8f0',desc:'หมาป่าศักดิ์สิทธิ์ เจ้าของ: Yamato'},
+  {label:'โทะริโทะริโนมิ: นูเอะ',sub:'Tori Tori no Mi Model: Nue',type:'mythical',w:0.625,color:'#7c3aed',desc:'สิ่งมีชีวิตในตำนาน เจ้าของ: Yamato (anime)'},
+  {label:'เฮะบิเฮะบิโนมิ: ยะมะตะโนะโอโระจิ',sub:'Hebi Hebi no Mi Model: Yamata no Orochi',type:'mythical',w:0.625,color:'#166534',desc:'งูแปดหัว เจ้าของ: Orochi'},
+  {label:'โทะริโทะริโนมิ: ฟีนิกซ์',sub:'Tori Tori no Mi Model: Phoenix',type:'mythical',w:0.625,color:'#2563eb',desc:'ฟีนิกซ์ฟื้นชีพด้วยเปลวไฟสีน้ำเงิน เจ้าของ: Marco'},
+  {label:'อุโอะอุโอะโนมิ: เซะอิริว',sub:'Uo Uo no Mi Model: Seiryu',type:'mythical',w:0.625,color:'#0891b2',desc:'มังกรศักดิ์สิทธิ์ เจ้าของ: Kaido'},
+  {label:'ซะระซะระโนมิ: อาโซะโละทล',sub:'Sara Sara no Mi Model: Axolotl',type:'mythical',w:0.625,color:'#ec4899',desc:'อัคโซลอเติลในตำนาน เจ้าของ: Smiley'},
+
+  // ANCIENT ZOAN (w ~0.8, total 8%)
+  {label:'ริวริวโนมิ: เทอราโนดอน',sub:'Ryu Ryu no Mi Model: Pteranodon',type:'ancient',w:0.8,color:'#f97316',desc:'เทอราโนดอน เจ้าของ: King'},
+  {label:'ริวริวโนมิ: สปิโนซอรัส',sub:'Ryu Ryu no Mi Model: Spinosaurus',type:'ancient',w:0.8,color:'#f97316',desc:'สปิโนซอรัส เจ้าของ: Page One'},
+  {label:'ริวริวโนมิ: เบรคิโอซอรัส',sub:'Ryu Ryu no Mi Model: Brachiosaurus',type:'ancient',w:0.8,color:'#f97316',desc:'เบรคิโอซอรัส เจ้าของ: Queen'},
+  {label:'ริวริวโนมิ: อัลโลซอรัส',sub:'Ryu Ryu no Mi Model: Allosaurus',type:'ancient',w:0.8,color:'#f97316',desc:'อัลโลซอรัส เจ้าของ: X Drake'},
+  {label:'ริวริวโนมิ: ไทรเซอราทอปส์',sub:'Ryu Ryu no Mi Model: Triceratops',type:'ancient',w:0.8,color:'#f97316',desc:'ไทรเซอราทอปส์ เจ้าของ: Sasaki'},
+  {label:'ริวริวโนมิ: แพคีเซฟาโลซอรัส',sub:'Ryu Ryu no Mi Model: Pachycephalosaurus',type:'ancient',w:0.8,color:'#fb923c',desc:'แพคีเซฟาโลซอรัส เจ้าของ: Ulti'},
+  {label:'โซซุโซซุโนมิ: แมมมอธ',sub:'Zou Zou no Mi Model: Mammoth',type:'ancient',w:0.8,color:'#9ca3af',desc:'แมมมอธ เจ้าของ: Jack'},
+  {label:'กะเมกะเมโนมิ',sub:'Kame Kame no Mi — เต่าทะเล',type:'ancient',w:0.8,color:'#16a34a',desc:'เต่าทะเลยักษ์โบราณ เจ้าของ: Master of the Waters'},
+  {label:'วะนิวะนิโนมิ',sub:'Wani Wani no Mi — จระเข้',type:'ancient',w:0.8,color:'#15803d',desc:'จระเข้โบราณ เจ้าของ: Gasparde'},
+  {label:'ริวริวโนมิ: อิกัวโนดอน',sub:'Ryu Ryu no Mi Model: Iguanodon',type:'ancient',w:0.8,color:'#ea580c',desc:'อิกัวโนดอน เจ้าของ: Franky (Shogun)'},
+
+  // REGULAR ZOAN (w ~0.85, total 17%)
+  {label:'เนโกะเนโกะโนมิ: เสือดาว',sub:'Neko Neko no Mi Model: Leopard',type:'zoan',w:0.85,color:'#22c55e',desc:'เสือดาว เจ้าของ: Rob Lucci'},
+  {label:'โทะริโทะริโนมิ: เหยี่ยว',sub:'Tori Tori no Mi Model: Falcon',type:'zoan',w:0.85,color:'#4ade80',desc:'เหยี่ยว เจ้าของ: Pell'},
+  {label:'อินุอินุโนมิ: หมาป่า',sub:'Inu Inu no Mi Model: Wolf',type:'zoan',w:0.85,color:'#86efac',desc:'หมาป่า เจ้าของ: Jabra'},
+  {label:'อินุอินุโนมิ: แจ็คคัล',sub:'Inu Inu no Mi Model: Jackal',type:'zoan',w:0.85,color:'#bbf7d0',desc:'แจ็คคัล เจ้าของ: Chaka'},
+  {label:'อินุอินุโนมิ: ดาชชุนด์',sub:'Inu Inu no Mi Model: Dachshund',type:'zoan',w:0.85,color:'#d1fae5',desc:'ดาชชุนด์ เจ้าของ: Lassoo (กระบอกปืน)'},
+  {label:'อุมะอุมะโนมิ',sub:'Uma Uma no Mi — ม้า',type:'zoan',w:0.85,color:'#a3e635',desc:'ม้า เจ้าของ: Pierre'},
+  {label:'โซซุโซซุโนมิ',sub:'Zou Zou no Mi — ช้าง',type:'zoan',w:0.85,color:'#84cc16',desc:'ช้าง เจ้าของ: Funkfreed (ดาบ)'},
+  {label:'มุชิมุชิโนมิ: กาบุโตะมุชิ',sub:'Mushi Mushi no Mi: Kabutomushi — แมลงกว่าง',type:'zoan',w:0.85,color:'#65a30d',desc:'แมลงกว่าง เจ้าของ: Shino'},
+  {label:'มุชิมุชิโนมิ: ซุซุเมะบะจิ',sub:'Mushi Mushi no Mi: Suzumebachi — ผึ้งต่อ',type:'zoan',w:0.85,color:'#4d7c0f',desc:'ผึ้งต่อ เจ้าของ: Bian'},
+  {label:'ฮิโตะฮิโตะโนมิ (ทั่วไป)',sub:'Hito Hito no Mi — มนุษย์',type:'zoan',w:0.85,color:'#15803d',desc:'แปลงเป็นมนุษย์ เจ้าของ: Tony Tony Chopper'},
+  {label:'บัตโตะบัตโตะโนมิ: แวมไพร์',sub:'Batto Batto no Mi Model: Vampire',type:'zoan',w:0.85,color:'#7f1d1d',desc:'แวมไพร์ เจ้าของ: Patrick Redfield'},
+  {label:'โมะกุโมะกุโนมิ: ตุ่น',sub:'Mogu Mogu no Mi — ตุ่น',type:'zoan',w:0.85,color:'#166534',desc:'ตุ่น ขุดอุโมงค์ได้ เจ้าของ: Miss Merry Christmas'},
+  {label:'คุมะคุมะโนมิ: กริซลีย์',sub:'Kuma Kuma no Mi: Grizzly — หมีกริซลีย์',type:'zoan',w:0.85,color:'#92400e',desc:'หมีกริซลีย์ เจ้าของ: Cherryย'},
+  {label:'โทะริโทะริโนมิ: อัลบาทรอส',sub:'Tori Tori no Mi Model: Albatross',type:'zoan',w:0.85,color:'#e2e8f0',desc:'อัลบาทรอส เจ้าของ: Morgans'},
+  {label:'อินุอินุโนมิ: ทานุกิ',sub:'Inu Inu no Mi Model: Tanuki',type:'zoan',w:0.85,color:'#78350f',desc:'แรคคูนทานุกิ เจ้าของ: Torino Kingdom'},
+  {label:'เนโกะเนโกะโนมิ: เสือเขี้ยวดาบ',sub:'Neko Neko no Mi Model: Saber-toothed Tiger',type:'zoan',w:0.85,color:'#b45309',desc:'เสือเขี้ยวดาบ เจ้าของ: Consul'},
+  {label:'มุชิมุชิโนมิ: แตน',sub:'Mushi Mushi no Mi: Hornet — แตน',type:'zoan',w:0.85,color:'#d97706',desc:'แตน เจ้าของ: ตัวประกอบ'},
+  {label:'ฟิชฟิชโนมิ',sub:'Fish Fish no Mi — ปลา',type:'zoan',w:0.85,color:'#0ea5e9',desc:'ปลาทะเลลึก เจ้าของ: ตัวประกอบ'},
+  {label:'ฮิโตะซุจิโนมิ',sub:'Hitotsume no Mi — ตาเดียว',type:'zoan',w:0.85,color:'#6366f1',desc:'สัตว์ตาเดียวในตำนาน เจ้าของ: ตัวประกอบ'},
+  {label:'ริวริวโนมิ: เทอร์โอดัคทิล',sub:'Ryu Ryu no Mi: Pterodactyl (ทั่วไป)',type:'zoan',w:0.85,color:'#8b5cf6',desc:'เทอร์โอดัคทิล เจ้าของ: ตัวประกอบ'},
+
+  // PARAMECIA (w ~1.325, total 53%)
+  {label:'โกะมุโกะมุโนมิ',sub:'Gomu Gomu no Mi — ยาง',type:'paramecia',w:1.325,color:'#ef4444',desc:'ร่างกายยืดหยุ่นเหมือนยาง เจ้าของ: Monkey D. Luffy'},
+  {label:'บะระบะระโนมิ',sub:'Bara Bara no Mi — แตกออก',type:'paramecia',w:1.325,color:'#f87171',desc:'แตกร่างออกเป็นชิ้น เจ้าของ: Buggy'},
+  {label:'ซุเบะซุเบะโนมิ',sub:'Sube Sube no Mi — ลื่น',type:'paramecia',w:1.325,color:'#fca5a5',desc:'ผิวลื่นมาก การโจมตีเลื่อนหลุด เจ้าของ: Alvida'},
+  {label:'โบมุโบมุโนมิ',sub:'Bomu Bomu no Mi — ระเบิด',type:'paramecia',w:1.325,color:'#f97316',desc:'ทุกส่วนของร่างกายระเบิดได้ เจ้าของ: Mr. 5'},
+  {label:'กิโระกิโระโนมิ',sub:'Kiro Kiro no Mi — น้ำหนัก',type:'paramecia',w:1.325,color:'#a78bfa',desc:'ควบคุมน้ำหนักตัวเอง เจ้าของ: Miss Valentine'},
+  {label:'ฮะนะฮะนะโนมิ',sub:'Hana Hana no Mi — ดอกไม้/แขนขา',type:'paramecia',w:1.325,color:'#f9a8d4',desc:'งอกแขนขาได้ทุกที่ เจ้าของ: Nico Robin'},
+  {label:'โดะรุโดะรุโนมิ',sub:'Doru Doru no Mi — ขี้ผึ้ง',type:'paramecia',w:1.325,color:'#fde68a',desc:'สร้างขี้ผึ้งได้ เจ้าของ: Galdino (Mr.3)'},
+  {label:'บะกุบะกุโนมิ',sub:'Baku Baku no Mi — กิน',type:'paramecia',w:1.325,color:'#6b7280',desc:'กินทุกอย่างและรวมเข้ากับร่างกาย เจ้าของ: Wapol'},
+  {label:'มะเนะมะเนะโนมิ',sub:'Mane Mane no Mi — เลียนแบบ',type:'paramecia',w:1.325,color:'#fbbf24',desc:'เลียนแบบหน้าตาคนอื่น เจ้าของ: Bentham (Mr.2)'},
+  {label:'โทะเงะโทะเงะโนมิ',sub:'Toge Toge no Mi — หนาม',type:'paramecia',w:1.325,color:'#84cc16',desc:'งอกหนามจากร่างกาย เจ้าของ: Miss Doublefinger'},
+  {label:'ซุปะซุปะโนมิ',sub:'Supa Supa no Mi — ใบมีด',type:'paramecia',w:1.325,color:'#cbd5e1',desc:'ร่างกายแข็งแกร่งเหมือนใบมีด เจ้าของ: Daz Bones'},
+  {label:'โอะริโอะริโนมิ',sub:'Ori Ori no Mi — กรงขัง',type:'paramecia',w:1.325,color:'#f59e0b',desc:'สร้างโซ่ตรวน เจ้าของ: Hina'},
+  {label:'บะเนะบะเนะโนมิ',sub:'Bane Bane no Mi — สปริง',type:'paramecia',w:1.325,color:'#10b981',desc:'ขาและแขนกลายเป็นสปริง เจ้าของ: Bellamy'},
+  {label:'อะวะอะวะโนมิ',sub:'Awa Awa no Mi — ฟอง',type:'paramecia',w:1.325,color:'#67e8f9',desc:'สร้างฟองสบู่ทำให้อ่อนแอ เจ้าของ: Kalifa'},
+  {label:'โนะโรโนะโระโนมิ',sub:'Noro Noro no Mi — ช้า',type:'paramecia',w:1.325,color:'#c4b5fd',desc:'ปล่อยลำแสงทำให้ช้าลง เจ้าของ: Foxy'},
+  {label:'โดะอะโดะอะโนมิ',sub:'Doa Doa no Mi — ประตู',type:'paramecia',w:1.325,color:'#a3e635',desc:'เปิดประตูได้ทุกที่ เจ้าของ: Blueno'},
+  {label:'อะโตะอะโตะโนมิ',sub:'Ato Ato no Mi — ศิลปะ',type:'paramecia',w:1.325,color:'#f472b6',desc:'เปลี่ยนสิ่งของเป็นงานศิลปะ เจ้าของ: Giolla'},
+  {label:'จะเกะจะเกะโนมิ',sub:'Jake Jake no Mi — แจ็คเก็ต',type:'paramecia',w:1.325,color:'#94a3b8',desc:'กลายเป็นแจ็คเก็ตสวมใส่ได้ เจ้าของ: Kelly Funk'},
+  {label:'ชิยุชิยุโนมิ',sub:'Chiyu Chiyu no Mi — รักษา',type:'paramecia',w:1.325,color:'#34d399',desc:'รักษาบาดแผลได้ เจ้าของ: Mansherry'},
+  {label:'โนะมิโนะมิโนมิ',sub:'Nomi Nomi no Mi — สมอง',type:'paramecia',w:1.325,color:'#a78bfa',desc:'จดจำทุกอย่างได้ไม่มีขีดจำกัด เจ้าของ: Ain'},
+  {label:'โทะกิโทะกิโนมิ',sub:'Toki Toki no Mi — เวลา',type:'paramecia',w:1.325,color:'#e879f9',desc:'ส่งตัวเองหรือคนอื่นไปยังอนาคต เจ้าของ: Toki'},
+  {label:'โซะรุโซะรุโนมิ',sub:'Soru Soru no Mi — วิญญาณ',type:'paramecia',w:1.325,color:'#f9a8d4',desc:'ดึงวิญญาณและใส่ลงในสิ่งของ เจ้าของ: Big Mom'},
+  {label:'โมะชิโมะชิโนมิ',sub:'Mochi Mochi no Mi — โมจิ',type:'paramecia',w:1.325,color:'#fde68a',desc:'ควบคุมโมจิ (ถือว่าเป็น Logia พิเศษ) เจ้าของ: Katakuri'},
+  {label:'ชิโบะชิโบะโนมิ',sub:'Shibo Shibo no Mi — คั้น',type:'paramecia',w:1.325,color:'#fb923c',desc:'คั้นน้ำออกจากทุกอย่าง เจ้าของ: Charlotte Smoothie'},
+  {label:'วะระวะระโนมิ',sub:'Wara Wara no Mi — ฟางแทนที่',type:'paramecia',w:1.325,color:'#d97706',desc:'โอนความเสียหายไปยังหุ่นฟาง เจ้าของ: Basil Hawkins'},
+  {label:'โอะเปะโอะเปะโนมิ',sub:'Ope Ope no Mi — ห้องผ่าตัด',type:'paramecia',w:1.325,color:'#2dd4bf',desc:'สร้างห้องผ่าตัด ควบคุมทุกอย่างภายใน เจ้าของ: Trafalgar Law'},
+  {label:'อิโตะอิโตะโนมิ',sub:'Ito Ito no Mi — เส้นด้าย',type:'paramecia',w:1.325,color:'#e879f9',desc:'ควบคุมด้วยเส้นด้าย เจ้าของ: Doflamingo'},
+  {label:'กะเงะกะเงะโนมิ',sub:'Kage Kage no Mi — เงา',type:'paramecia',w:1.325,color:'#1e1b4b',desc:'ควบคุมเงา เจ้าของ: Gecko Moria'},
+  {label:'โฮะโระโฮะโระโนมิ',sub:'Horo Horo no Mi — ผี',type:'paramecia',w:1.325,color:'#818cf8',desc:'สร้างผีลบอารมณ์ เจ้าของ: Perona'},
+  {label:'โดะกุโดะกุโนมิ',sub:'Doku Doku no Mi — พิษ',type:'paramecia',w:1.325,color:'#7c3aed',desc:'สร้างและทนพิษ เจ้าของ: Magellan'},
+  {label:'กุระกุระโนมิ',sub:'Gura Gura no Mi — สั่นสะเทือน',type:'paramecia',w:1.325,color:'#6b7280',desc:'สร้างแรงสั่นสะเทือนได้ เจ้าของ: Whitebeard / Blackbeard'},
+  {label:'ซุชิซุชิโนมิ',sub:'Zushi Zushi no Mi — แรงโน้มถ่วง',type:'paramecia',w:1.325,color:'#1d4ed8',desc:'ควบคุมแรงโน้มถ่วง เจ้าของ: Fujitora'},
+  {label:'บะริบะริโนมิ',sub:'Bari Bari no Mi — กำแพง',type:'paramecia',w:1.325,color:'#0284c7',desc:'สร้างกำแพงที่แตกไม่ได้ เจ้าของ: Bartolomeo'},
+  {label:'นะกิโนะมิ',sub:'Nagi Nagi no Mi — ความเงียบ',type:'paramecia',w:1.325,color:'#475569',desc:'สร้างพื้นที่ไร้เสียง เจ้าของ: Corazon'},
+  {label:'กิโระกิโระโนมิ (โรบิน)',sub:'Giro Giro no Mi — มองเห็น',type:'paramecia',w:1.325,color:'#f9a8d4',desc:'มองเห็นทุกสิ่ง เจ้าของ: Viola'},
+  {label:'อิชิอิชิโนมิ',sub:'Ishi Ishi no Mi — หิน',type:'paramecia',w:1.325,color:'#78716c',desc:'รวมกับหิน เจ้าของ: Pica'},
+  {label:'โฮะบิโฮะบิโนมิ',sub:'Hobi Hobi no Mi — ของเล่น',type:'paramecia',w:1.325,color:'#f472b6',desc:'เปลี่ยนมนุษย์เป็นของเล่น เจ้าของ: Sugar'},
+  {label:'เมะโมะเมะโมะโนมิ',sub:'Memo Memo no Mi — ความทรงจำ',type:'paramecia',w:1.325,color:'#818cf8',desc:'ดึงและแก้ไขความทรงจำ เจ้าของ: Charlotte Pudding'},
+  {label:'นุยนุยโนมิ',sub:'Nui Nui no Mi — เย็บ',type:'paramecia',w:1.325,color:'#f43f5e',desc:'เย็บติดสิ่งของหรือคน เจ้าของ: Leo'},
+];
+
+// ---------- SWORDS ----------
+const SWORDS_RAW = [
+  // SUPREME GRADE — 2% total (4 swords, each 0.5%)
+  {label:'ยอรุ',sub:'Yoru — ดาบดำ',grade:'supreme',w:0.5,color:'#1e1b4b',desc:'ดาบเกรด Supreme ของ Dracule Mihawk ดาบที่แข็งแกร่งที่สุดในโลก'},
+  {label:'เอซ',sub:'Ace — ดาบของ Roger/Garp',grade:'supreme',w:0.5,color:'#f5c842',desc:'ดาบเกรด Supreme เคยเป็นของ Gol D. Roger และ Monkey D. Garp'},
+  {label:'มุระกุโมะกิริ',sub:'Murakumogiri — หอกมีด',grade:'supreme',w:0.5,color:'#e2e8f0',desc:'ดาบเกรด Supreme ของ Whitebeard อาวุธรูปโนนะกินะยักษ์'},
+  {label:'โชะไดกิเตะสึ',sub:'Shodai Kitetsu — Kitetsu 1',grade:'supreme',w:0.5,color:'#dc2626',desc:'ดาบสาปเกรด Supreme คมที่สุดในตระกูล Kitetsu'},
+
+  // GREAT GRADE — 10% total (11 swords, each ~0.91%)
+  {label:'วะโดอิจิโมนจิ',sub:'Wado Ichimonji — ดาบขาว',grade:'great',w:0.91,color:'#e2e8f0',desc:'ดาบของ Zoro เดิมเป็นของ Kuina เกรด Great Grade'},
+  {label:'นิไดกิเตะสึ',sub:'Nidai Kitetsu — Kitetsu 2',grade:'great',w:0.91,color:'#dc2626',desc:'ดาบสาปเกรด Great Grade ปัจจุบัน: Zoro (ยืม)'},
+  {label:'ชูซุอิ',sub:'Shusui — ดาบดำ',grade:'great',w:0.91,color:'#1e293b',desc:'ดาบแห่งชาติของ Wano เกรด Great ครั้งแรกของ Ryuma ต่อมา Zoro'},
+  {label:'เอ็นมะ',sub:'Enma — ดาบดูดฮาคิ',grade:'great',w:0.91,color:'#0f172a',desc:'ดาบของ Kozuki Oden เกรด Great Grade ปัจจุบัน: Zoro'},
+  {label:'อะเมะโนะฮะบะกิริ',sub:'Ame no Habakiri — ดาบฟ้า',grade:'great',w:0.91,color:'#7dd3fc',desc:'ดาบของ Kozuki Oden เกรด Great Grade ปัจจุบัน: Yamato'},
+  {label:'กริฟฟอน',sub:'Griffon — ดาบงอน',grade:'great',w:0.91,color:'#fbbf24',desc:'ดาบขนาดใหญ่ของ Silvers Rayleigh เกรด Great Grade'},
+  {label:'กะมุซะริ',sub:'Kamusari — ดาบ Roger',grade:'great',w:0.91,color:'#f97316',desc:'ดาบของ Gol D. Roger เกรด Great Grade'},
+  {label:'เพรทเซล',sub:'Pretzel — อาวุธดาบ',grade:'great',w:0.91,color:'#d97706',desc:'อาวุธของ Charlotte Cracker เกรด Great Grade'},
+  {label:'ยุบะชิริ',sub:'Yubashiri — ดาบเบา',grade:'great',w:0.91,color:'#e2e8f0',desc:'ดาบเบาเคยของ Zoro ถูกทำลายโดย Shu เกรด Great Grade'},
+  {label:'นะโปะเลียน',sub:'Napoleon — ดาบหมวก',grade:'great',w:0.91,color:'#fde68a',desc:'ดาบในหมวกของ Big Mom เกรด Great Grade มีวิญญาณ Zeus'},
+  {label:'ซะนะไดกิเตะสึ',sub:'Sandai Kitetsu — Kitetsu 3',grade:'great',w:0.91,color:'#ef4444',desc:'ดาบสาปเกรด Great/Skillful ปัจจุบัน: Zoro'},
+
+  // SKILLFUL GRADE — 23% total (10 swords, each ~2.3%)
+  {label:'ชิกุเระ',sub:'Shigure — ดาบ Tashigi',grade:'skillful',w:2.3,color:'#94a3b8',desc:'ดาบของ Tashigi เกรด Skillful Grade'},
+  {label:'แบมบีนา',sub:'Bambina — ดาบ Rebecca',grade:'skillful',w:2.3,color:'#f9a8d4',desc:'ดาบของ Rebecca เกรด Skillful Grade'},
+  {label:'ดูรันดัล',sub:'Durandal — ดาบสวย',grade:'skillful',w:2.3,color:'#e0f2fe',desc:'ดาบของ Cavendish เกรด Skillful Grade คมมาก'},
+  {label:'ฟังก์ฟรีด',sub:'Funkfreed — ดาบช้าง',grade:'skillful',w:2.3,color:'#86efac',desc:'ดาบของ Spandam กินผล Zoan ช้าง'},
+  {label:'คาชู',sub:'Kashu — ดาบโบราณ',grade:'skillful',w:2.3,color:'#fde68a',desc:'ดาบเกรด Skillful Grade ในโลกใต้'},
+  {label:'ไรอุ',sub:'Raiu — ดาบสายฟ้า',grade:'skillful',w:2.3,color:'#fbbf24',desc:'ดาบของ Ryuuma เกรด Skillful Grade'},
+  {label:'โซลโซลิด',sub:'Soul Solid — ดาบเย็น',grade:'skillful',w:2.3,color:'#e0f2fe',desc:'ดาบเย็นของ Brook ดาบกีตาร์ หัวกระโหลก เกรด Skillful'},
+  {label:'คลิมะแทคท์',sub:'Clima-Tact — ไม้กายสิทธิ์',grade:'skillful',w:2.3,color:'#fde68a',desc:'ไม้ควบคุมอากาศของ Nami สร้างโดย Usopp'},
+  {label:'เฟบิน',sub:'Febin — ดาบ',grade:'skillful',w:2.3,color:'#94a3b8',desc:'ดาบ Skillful Grade ในโลกใต้'},
+  {label:'มิคิตะ',sub:'Mikita — ดาบ Skillful',grade:'skillful',w:2.3,color:'#c4b5fd',desc:'ดาบ Skillful Grade โบราณ'},
+
+  // GOOD GRADE / UNGRADED — 65% total (7 swords, each ~9.3%)
+  {label:'โคะกะตะนะ',sub:'Kogatana — มีดพก Buggy',grade:'good',w:9.3,color:'#94a3b8',desc:'มีดพกของ Buggy อาวุธที่เล็กที่สุดในซีรีส์'},
+  {label:'ดาบของ Xebec',sub:'Saber of Xebec — ดาบตำนาน',grade:'good',w:9.3,color:'#374151',desc:'ดาบของ Rocks D. Xebec ผู้ยิ่งใหญ่ก่อนยุค Roger'},
+  {label:'ดาบ Rebecca',sub:'Flower Sword — ดาบดอกไม้',grade:'good',w:9.3,color:'#f9a8d4',desc:'ดาบดอกไม้ของ Rebecca นักสู้อารีน่า Dressrosa'},
+  {label:'ดาบ Daddy',sub:'Daddy Masterson — ปืนดาบ',grade:'good',w:9.3,color:'#6b7280',desc:'ปืนดาบของนักล่าเงินรางวัล Daddy Masterson'},
+  {label:'ดาบ Johnny & Yosaku',sub:'Sword Duo — ดาบสองเล่ม',grade:'good',w:9.3,color:'#6b7280',desc:'ดาบของ Johnny และ Yosaku เพื่อนเก่า Zoro'},
+  {label:'ฮะนะโระบิ',sub:'Hanarobi — ดาบธรรมดา',grade:'good',w:9.3,color:'#94a3b8',desc:'ดาบไม่มีเกรด ใช้งานทั่วไป'},
+  {label:'ดาบทั่วไป',sub:'Common Sword — ดาบนิรนาม',grade:'good',w:9.3,color:'#64748b',desc:'ดาบทั่วไปไม่มีชื่อ ใช้กันในโลกใต้'},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let charPipeline = [];
+let charPipelineIdx = 0;
+let charResults2 = [];
+let charAngle = 0;
+let charSpinning = false;
+
+let fruitFilter = 'all';
+let fruitSpinCount = 0;
+let fruitHistory = [];
+let fruitAngle = 0;
+let fruitSpinning = false;
+
+let swordFilter = 'all';
+let swordSpinCount = 0;
+let swordHistory = [];
+let swordAngle = 0;
+let swordSpinning = false;
+
+let activeTab = 'char';
+
+// ============================================================
+// UTILS
+// ============================================================
+function totalW(arr){ return arr.reduce((s,i)=>s+i.w,0); }
+function weightedPick(arr){
+  const tot = totalW(arr);
+  let r = Math.random()*tot;
+  for(let i=0;i<arr.length;i++){ r-=arr[i].w; if(r<=0) return i; }
+  return arr.length-1;
+}
+function midAngle(arr,idx){
+  const tot = totalW(arr);
+  let a=0;
+  for(let i=0;i<idx;i++) a+=(arr[i].w/tot)*360;
+  return a+(arr[idx].w/tot)*360/2;
+}
+
+// ============================================================
+// CANVAS WHEEL DRAW
+// ============================================================
+function drawWheelCanvas(canvasId, items, rotation){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height, cx=W/2, cy=H/2, r=W/2-4;
+  ctx.clearRect(0,0,W,H);
+
+  // clip circle
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.clip();
+
+  const tot = totalW(items);
+  let sa = (rotation-90)*Math.PI/180;
+
+  items.forEach((item)=>{
+    const angle = (item.w/tot)*Math.PI*2;
+    const ea = sa+angle;
+    const mid = sa+angle/2;
+
+    // segment
+    const grd = ctx.createRadialGradient(
+      cx+Math.cos(mid)*r*0.35, cy+Math.sin(mid)*r*0.35, 0, cx, cy, r
+    );
+    const c = item.color||'#4a90d9';
+    grd.addColorStop(0, c+'ff');
+    grd.addColorStop(1, c+'77');
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,sa,ea);
+    ctx.closePath();
+    ctx.fillStyle = grd;
+    ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,0.35)';
+    ctx.lineWidth=1;
+    ctx.stroke();
+
+    // label
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(mid);
+    const td = r*0.6;
+    ctx.translate(td,0);
+    const n = items.length;
+    let fs = n<=6?12:n<=12?10:n<=20?8:n<=40?7:6;
+    const lbl = item.label||'';
+    ctx.font=`bold ${fs}px 'Noto Sans Thai',sans-serif`;
+    ctx.fillStyle='#fff';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,0.9)';
+    ctx.shadowBlur=3;
+
+    // split label
+    const MAX=7;
+    if(lbl.length<=MAX){
+      ctx.fillText(lbl,0,0);
+    } else if(lbl.length<=MAX*2){
+      const h=Math.ceil(lbl.length/2);
+      ctx.fillText(lbl.substring(0,h),0,-fs*0.65);
+      ctx.fillText(lbl.substring(h),0,fs*0.65);
+    } else {
+      const h=Math.ceil(lbl.length/3);
+      ctx.fillText(lbl.substring(0,h),0,-fs*1.1);
+      ctx.fillText(lbl.substring(h,h*2),0,0);
+      ctx.fillText(lbl.substring(h*2),0,fs*1.1);
+    }
+    ctx.restore();
+    sa=ea;
+  });
+
+  ctx.restore();
+
+  // border ring
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.strokeStyle='rgba(245,200,66,0.5)';
+  ctx.lineWidth=3;
+  ctx.stroke();
+}
+
+// ============================================================
+// GENERIC SPIN ENGINE
+// ============================================================
+function spinWheel(canvasId, items, currentAngle, onDone){
+  const winIdx = weightedPick(items);
+  const winMid = midAngle(items, winIdx);
+  // pointer at top: we want winMid to be at top (0deg)
+  const target = (360 - winMid) % 360;
+  const extra = (5+Math.floor(Math.random()*5))*360;
+  const total = extra + target;
+  const dur = 3000+Math.random()*1200;
+
+  let start=null;
+  const startA = currentAngle;
+
+  function ease(t){ return 1-Math.pow(1-t,4); }
+  function frame(ts){
+    if(!start) start=ts;
+    const el=ts-start;
+    const p=Math.min(el/dur,1);
+    const cur=startA+total*ease(p);
+    drawWheelCanvas(canvasId, items, cur%360);
+    if(p<1){ requestAnimationFrame(frame); }
+    else { onDone(cur%360, winIdx); }
+  }
+  requestAnimationFrame(frame);
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function switchTab(tab){
+  activeTab = tab;
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{
+    t.classList.toggle('active', ['char','fruit','sword'][i]===tab);
+  });
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+tab).classList.add('active');
+
+  if(tab==='fruit'){ updateFruitInfo(); if(!fruitSpinning) redrawFruit(); }
+  if(tab==='sword'){ updateSwordInfo(); if(!swordSpinning) redrawSword(); }
+}
+
+// ============================================================
+// CHARACTER WHEEL — FLOW ENGINE
+// ============================================================
+//
+// charPipeline = ordered list of stage descriptors to spin through.
+// Built dynamically after each spin result so we can insert
+// bonus fruit/sword stages in the right place.
+//
+// Each stage descriptor:
+//   { key, name, icon, items, isFruit, isSword, fruitType, swordGrade }
+//
+// charPipelineIdx = current position in pipeline
+// charResults2    = array of { key, icon, name, resultItem, color, rarity, sub }
+
+const STAGE_IDX = { race:0, fruit:1, weapon:2, skill:3, haki:4, hakilv:5, role:6 };
+const STAGE_KEYS = ['race','fruit','weapon','skill','haki','hakilv','role'];
+
+function buildInitialPipeline(){
+  charPipeline = CHAR_STAGES.map((s,i)=>({ key: STAGE_KEYS[i], ...s }));
+}
+
+function currentPipelineStage(){ return charPipeline[charPipelineIdx]; }
+
+// After spinning a result, call this to possibly inject/remove bonus stages
+function mutatePipelineAfter(key, resultLabel){
+  // Remove only injected stages that are still AHEAD (not yet visited)
+  charPipeline = charPipeline.filter((s, i) => i <= charPipelineIdx || !s.injected);
+
+  // 1) Fruit stage → inject bonus_fruit spin immediately after current idx
+  if(key==='fruit'){
+    const fruitType = fruitTypeFromLabel(resultLabel);
+    if(fruitType){
+      const fruitItems = FRUITS_RAW.filter(f=>f.type===fruitType);
+      const typeLabel2={paramecia:'พารามีเซีย',zoan:'โซออนทั่วไป',logia:'โลเกีย',mythical:'อสูรมายา',ancient:'โบราณ'};
+      const typeColor2={paramecia:'#ef4444',zoan:'#22c55e',logia:'#3b82f6',mythical:'#a855f7',ancient:'#f97316'};
+      charPipeline.splice(charPipelineIdx+1, 0, {
+        key:'bonus_fruit', injected:true,
+        name:`ผลปีศาจ${typeLabel2[fruitType]||''}`,
+        icon:'🍎',
+        items: fruitItems,
+        isFruit:true, fruitType,
+        accentColor: typeColor2[fruitType]||'#ef4444',
+      });
+    }
+  }
+
+  // 2) Weapon stage → inject bonus_sword spin immediately after current idx
+  if(key==='weapon' && resultLabel==='ดาบเลื่องชื่อ'){
+    const swordItems = SWORDS_RAW.filter(s=>s.grade==='supreme'||s.grade==='great');
+    charPipeline.splice(charPipelineIdx+1, 0, {
+      key:'bonus_sword', injected:true,
+      name:'ดาบ Meito (Supreme/Great)',
+      icon:'⚔️',
+      items: swordItems,
+      isSword:true,
+      accentColor:'#f5c842',
+    });
+  }
+
+  // 3) Haki → remove hakilv if no haki
+  if(key==='haki' && resultLabel==='ไม่มีฮาคิ'){
+    charPipeline = charPipeline.filter(s => s.key!=='hakilv');
+  }
+}
+
+function fruitTypeFromLabel(l){
+  if(l==='พารามีเซีย') return 'paramecia';
+  if(l==='โซออนทั่วไป') return 'zoan';
+  if(l==='โลเกีย') return 'logia';
+  if(l==='โซออนอสูรมายา') return 'mythical';
+  return null;
+}
+
+// Build progress bar from current pipeline
+function buildProgressBar(){
+  const bar=document.getElementById('progressBar');
+  bar.innerHTML='';
+  charPipeline.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='progress-dot';
+    d.id='pdot-'+i;
+    bar.appendChild(d);
+  });
+  updatePB();
+}
+
+function updatePB(){
+  charPipeline.forEach((_,i)=>{
+    const d=document.getElementById('pdot-'+i);
+    if(!d) return;
+    d.className='progress-dot'+(i<charPipelineIdx?' done':i===charPipelineIdx?' active':'');
+    d.style.background = i===charPipelineIdx && charPipeline[i].accentColor
+      ? charPipeline[i].accentColor : '';
+  });
+}
+
+function charItems(){ return currentPipelineStage().items; }
+
+function updateCharUI(){
+  // Rebuild progress dots in case pipeline changed
+  buildProgressBar();
+  const s = currentPipelineStage();
+  const total = charPipeline.length;
+  document.getElementById('stageNum').textContent=`ขั้นที่ ${charPipelineIdx+1} / ${total}`;
+  document.getElementById('stageName').textContent=`${s.icon} ${s.name}`;
+
+  // accent color for bonus stages
+  const accent = s.accentColor || null;
+  const nameEl = document.getElementById('stageName');
+  nameEl.style.color = accent ? accent : '';
+  nameEl.style.textShadow = accent ? `0 0 14px ${accent}55` : '';
+
+  document.getElementById('charResult').classList.remove('show');
+  document.getElementById('charNextBtn').classList.remove('show');
+  document.getElementById('charSpinBtn').disabled=false;
+  drawWheelCanvas('charWheel', charItems(), charAngle);
+}
+
+function charSpin(){
+  if(charSpinning) return;
+  charSpinning=true;
+  document.getElementById('charSpinBtn').disabled=true;
+  document.getElementById('charResult').classList.remove('show');
+  document.getElementById('charNextBtn').classList.remove('show');
+
+  const items=charItems();
+  spinWheel('charWheel', items, charAngle, (newAngle, winIdx)=>{
+    charAngle=newAngle;
+    charSpinning=false;
+    const item=items[winIdx];
+    const stage=currentPipelineStage();
+
+    // Store result BEFORE mutating pipeline
+    const rc = item.rc || item.color || stage.accentColor || '#f5c842';
+    const rarity = item.rarity || gradeRarity(item.grade) || typeRarity(item.type) || 'ปกติ';
+    // Use charPipelineIdx as slot — safe because we store before inject shifts future
+    charResults2[charPipelineIdx] = {
+      key: stage.key,
+      icon: stage.icon,
+      name: stage.name,
+      resultItem: item,
+      rc,
+      rarity,
+      sub: item.sub || null,
+    };
+
+    // Mutate pipeline AFTER storing result
+    mutatePipelineAfter(stage.key, item.label);
+
+    showCharResult(item, stage);
+  });
+}
+
+function showCharResult(item, stage){
+  const rc = item.rc || item.color || stage.accentColor || '#f5c842';
+  const rarity = item.rarity || gradeRarity(item.grade) || typeRarity(item.type) || 'ปกติ';
+
+  document.getElementById('charResultLabel').textContent = stage.name;
+  document.getElementById('charResultValue').textContent = item.label;
+  document.getElementById('charResultDesc').textContent = item.desc||item.sub||'';
+  const b=document.getElementById('charRarityBadge');
+  b.textContent='★ '+rarity;
+  b.style.background=rc+'22'; b.style.color=rc; b.style.border=`1px solid ${rc}44`;
+  document.getElementById('charResult').classList.add('show');
+
+  // Update pipeline (in case mutatePipeline added stages)
+  buildProgressBar();
+
+  const isLast = charPipelineIdx >= charPipeline.length - 1;
+  const nb=document.getElementById('charNextBtn');
+  nb.textContent = isLast ? '🏴‍☠️ ดูตัวละคร!' : 'ถัดไป →';
+  nb.classList.add('show');
+
+  if(['หายากมาก','ตำนาน','ตำนาน','หายากมาก'].includes(rarity)) spawnFireworks(rc);
+}
+
+function charNext(){
+  if(charPipelineIdx >= charPipeline.length - 1){
+    showCharSummary();
+    return;
+  }
+  charPipelineIdx++;
+  charAngle=0;
+  updateCharUI();
+}
+
+function showCharSummary(){
+  document.getElementById('charSummary').style.display='block';
+  document.querySelector('.progress-bar').style.display='none';
+  document.querySelector('.stage-label').style.display='none';
+  document.querySelector('.wheel-wrap').style.display='none';
+  document.getElementById('charResult').style.display='none';
+  document.getElementById('charNextBtn').style.display='none';
+
+  const grid=document.getElementById('summaryGrid');
+  grid.innerHTML='';
+
+  charResults2.filter(Boolean).forEach((r,i)=>{
+    if(!r) return;
+    const el=document.createElement('div');
+    el.className='summary-item';
+    // Highlight bonus stages
+    const isFruitBonus = r.key==='bonus_fruit';
+    const isSwordBonus = r.key==='bonus_sword';
+    if(isFruitBonus||isSwordBonus){
+      el.style.border=`1px solid ${r.rc}55`;
+      el.style.background=`${r.rc}0a`;
+    }
+    el.innerHTML=`
+      <div class="summary-icon">${r.icon}</div>
+      <div class="summary-info">
+        <div class="summary-cat">${r.name}${isFruitBonus?'  <span style="font-size:9px;color:var(--teal);letter-spacing:1px">BONUS</span>':isSwordBonus?'  <span style="font-size:9px;color:var(--gold);letter-spacing:1px">BONUS</span>':''}</div>
+        <div class="summary-val">${r.resultItem.label}</div>
+        ${r.sub?`<div style="font-size:10px;color:rgba(240,236,216,.45);margin-top:1px">${r.sub}</div>`:''}
+      </div>
+      <div class="summary-badge" style="background:${r.rc}22;color:${r.rc};border:1px solid ${r.rc}44">★ ${r.rarity}</div>
+    `;
+    grid.appendChild(el);
+    setTimeout(()=>el.classList.add('appear'),80+i*100);
+  });
+
+  // clear old bonus section
+  document.getElementById('summaryBonus').innerHTML='';
+
+  spawnFireworks('#f5c842');
+  setTimeout(()=>spawnFireworks('#00c9c8'),400);
+}
+
+function charReset(){
+  charPipelineIdx=0; charResults2=[]; charAngle=0; charSpinning=false;
+  buildInitialPipeline();
+  document.getElementById('charSummary').style.display='none';
+  document.getElementById('summaryBonus').innerHTML='';
+  document.querySelector('.progress-bar').style.display='flex';
+  document.querySelector('.stage-label').style.display='block';
+  document.querySelector('.wheel-wrap').style.display='flex';
+  document.getElementById('charResult').style.display='';
+  document.getElementById('charNextBtn').style.display='';
+  document.getElementById('stageName').style.color='';
+  document.getElementById('stageName').style.textShadow='';
+  buildProgressBar();
+  updateCharUI();
+}
+
+// ============================================================
+// DEVIL FRUIT WHEEL
+// ============================================================
+function getFruitItems(){
+  if(fruitFilter==='all') return FRUITS_RAW;
+  return FRUITS_RAW.filter(f=>f.type===fruitFilter);
+}
+
+function setFruitFilter(f, el){
+  fruitFilter=f;
+  fruitAngle=0;
+  document.querySelectorAll('#fruitChips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  updateFruitInfo();
+  redrawFruit();
+  document.getElementById('fruitResult').classList.remove('show');
+}
+
+function updateFruitInfo(){
+  const items=getFruitItems();
+  document.getElementById('fruitSpinInfo').textContent=`รวม ${items.length} ผล | หมุนแล้ว ${fruitSpinCount} ครั้ง`;
+}
+
+function redrawFruit(){
+  const items=getFruitItems();
+  if(items.length>0) drawWheelCanvas('fruitWheel', items, fruitAngle);
+}
+
+function typeLabel(t){
+  const m={logia:'โลเกีย',mythical:'อสูรมายา',ancient:'โบราณ',zoan:'โซออน',paramecia:'พารามีเซีย'};
+  return m[t]||t;
+}
+function typeColor(t){
+  const m={logia:'#3b82f6',mythical:'#a855f7',ancient:'#f97316',zoan:'#22c55e',paramecia:'#ef4444'};
+  return m[t]||'#888';
+}
+function typeRarity(t){
+  const m={logia:'หายากมาก',mythical:'ตำนาน',ancient:'หายากมาก',zoan:'หายาก',paramecia:'พิเศษ'};
+  return m[t]||'ปกติ';
+}
+
+function fruitSpin(){
+  if(fruitSpinning) return;
+  const items=getFruitItems();
+  if(!items.length) return;
+  fruitSpinning=true;
+  document.getElementById('fruitSpinBtn').disabled=true;
+  document.getElementById('fruitResult').classList.remove('show');
+
+  spinWheel('fruitWheel', items, fruitAngle, (newAngle, winIdx)=>{
+    fruitAngle=newAngle;
+    fruitSpinning=false;
+    fruitSpinCount++;
+    document.getElementById('fruitSpinBtn').disabled=false;
+    const item=items[winIdx];
+
+    const c=typeColor(item.type);
+    const r=typeRarity(item.type);
+    document.getElementById('fruitResultLabel').textContent=typeLabel(item.type);
+    document.getElementById('fruitResultValue').textContent=item.label;
+    document.getElementById('fruitResultSub').textContent=item.sub||'';
+    document.getElementById('fruitResultDesc').textContent=item.desc||'';
+    const b=document.getElementById('fruitRarityBadge');
+    b.textContent='★ '+r;
+    b.style.background=c+'22'; b.style.color=c; b.style.border=`1px solid ${c}44`;
+    document.getElementById('fruitResult').classList.add('show');
+
+    // history
+    fruitHistory.unshift({label:item.label, color:c});
+    if(fruitHistory.length>10) fruitHistory.pop();
+    renderFruitHistory();
+    updateFruitInfo();
+    if(['ตำนาน','หายากมาก'].includes(r)) spawnFireworks(c);
+  });
+}
+
+function renderFruitHistory(){
+  const wrap=document.getElementById('fruitHistoryWrap');
+  const list=document.getElementById('fruitHistory');
+  if(!fruitHistory.length){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  list.innerHTML=fruitHistory.map(h=>`
+    <span class="history-chip" style="color:${h.color};border-color:${h.color}33">${h.label}</span>
+  `).join('');
+}
+
+// ============================================================
+// SWORD WHEEL
+// ============================================================
+function getSwordItems(){
+  if(swordFilter==='all') return SWORDS_RAW;
+  if(swordFilter==='supreme_great') return SWORDS_RAW.filter(s=>s.grade==='supreme'||s.grade==='great');
+  return SWORDS_RAW.filter(s=>s.grade===swordFilter);
+}
+
+function setSwordFilter(f, el){
+  swordFilter=f;
+  swordAngle=0;
+  document.querySelectorAll('#swordChips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  updateSwordInfo();
+  redrawSword();
+  document.getElementById('swordResult').classList.remove('show');
+}
+
+function updateSwordInfo(){
+  const items=getSwordItems();
+  document.getElementById('swordSpinInfo').textContent=`รวม ${items.length} เล่ม | หมุนแล้ว ${swordSpinCount} ครั้ง`;
+}
+
+function redrawSword(){
+  const items=getSwordItems();
+  if(items.length>0) drawWheelCanvas('swordWheel', items, swordAngle);
+}
+
+function gradeLabel(g){
+  const m={supreme:'Supreme Grade',great:'Great Grade',skillful:'Skillful Grade',good:'Good Grade / อื่นๆ'};
+  return m[g]||g;
+}
+function gradeColor(g){
+  const m={supreme:'#f5c842',great:'#e2e8f0',skillful:'#fb923c',good:'#94a3b8'};
+  return m[g]||'#888';
+}
+function gradeRarity(g){
+  const m={supreme:'ตำนาน',great:'หายากมาก',skillful:'หายาก',good:'ปกติ'};
+  return m[g]||'ปกติ';
+}
+
+function swordSpin(){
+  if(swordSpinning) return;
+  const items=getSwordItems();
+  if(!items.length) return;
+  swordSpinning=true;
+  document.getElementById('swordSpinBtn').disabled=true;
+  document.getElementById('swordResult').classList.remove('show');
+
+  spinWheel('swordWheel', items, swordAngle, (newAngle, winIdx)=>{
+    swordAngle=newAngle;
+    swordSpinning=false;
+    swordSpinCount++;
+    document.getElementById('swordSpinBtn').disabled=false;
+    const item=items[winIdx];
+
+    const c=gradeColor(item.grade);
+    const r=gradeRarity(item.grade);
+    document.getElementById('swordResultLabel').textContent=gradeLabel(item.grade);
+    document.getElementById('swordResultValue').textContent=item.label;
+    document.getElementById('swordResultSub').textContent=item.sub||'';
+    document.getElementById('swordResultDesc').textContent=item.desc||'';
+    const b=document.getElementById('swordRarityBadge');
+    b.textContent='★ '+r;
+    b.style.background=c+'22'; b.style.color=c; b.style.border=`1px solid ${c}44`;
+    document.getElementById('swordResult').classList.add('show');
+
+    swordHistory.unshift({label:item.label, color:c});
+    if(swordHistory.length>10) swordHistory.pop();
+    renderSwordHistory();
+    updateSwordInfo();
+    if(['ตำนาน','หายากมาก'].includes(r)) spawnFireworks(c);
+  });
+}
+
+function renderSwordHistory(){
+  const wrap=document.getElementById('swordHistoryWrap');
+  const list=document.getElementById('swordHistory');
+  if(!swordHistory.length){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  list.innerHTML=swordHistory.map(h=>`
+    <span class="history-chip" style="color:${h.color};border-color:${h.color}33">${h.label}</span>
+  `).join('');
+}
+
+// ============================================================
+// FIREWORKS
+// ============================================================
+function spawnFireworks(color){
+  const c=document.getElementById('fireworks');
+  const cols=[color,'#fff','#f5c842','#00c9c8','#fff'];
+  for(let i=0;i<28;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const x=15+Math.random()*70, y=10+Math.random()*50;
+    const tx=(Math.random()-.5)*180, ty=(Math.random()-.5)*180;
+    const dur=0.5+Math.random()*0.7;
+    p.style.cssText=`left:${x}%;top:${y}%;background:${cols[Math.floor(Math.random()*cols.length)]};--tx:${tx}px;--ty:${ty}px;--dur:${dur}s;--delay:${Math.random()*0.2}s;width:${4+Math.random()*5}px;height:${4+Math.random()*5}px`;
+    c.appendChild(p);
+    setTimeout(()=>p.remove(),(dur+0.2)*1000+300);
+  }
+}
+
+// ============================================================
+// MODAL / RESET
+// ============================================================
+function openModal(){ document.getElementById('resetModal').classList.add('open'); }
+function closeModal(){ document.getElementById('resetModal').classList.remove('open'); }
+function confirmReset(){
+  closeModal();
+  charReset();
+  // reset fruit
+  fruitFilter='all'; fruitSpinCount=0; fruitHistory=[]; fruitAngle=0; fruitSpinning=false;
+  document.querySelectorAll('#fruitChips .chip').forEach(c=>c.classList.remove('active'));
+  document.querySelector('#fruitChips .all').classList.add('active');
+  document.getElementById('fruitResult').classList.remove('show');
+  document.getElementById('fruitHistoryWrap').style.display='none';
+  // reset sword
+  swordFilter='all'; swordSpinCount=0; swordHistory=[]; swordAngle=0; swordSpinning=false;
+  document.querySelectorAll('#swordChips .chip').forEach(c=>c.classList.remove('active'));
+  document.querySelector('#swordChips .all').classList.add('active');
+  document.getElementById('swordResult').classList.remove('show');
+  document.getElementById('swordHistoryWrap').style.display='none';
+  updateFruitInfo(); updateSwordInfo();
+  if(activeTab==='fruit') redrawFruit();
+  if(activeTab==='sword') redrawSword();
+}
+
+// ============================================================
+// STARS
+// ============================================================
+function createStars(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<70;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*4}s;--b:${0.4+Math.random()*0.6};width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;background:#fff`;
+    c.appendChild(s);
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload=function(){
+  createStars();
+  buildInitialPipeline();
+  buildProgressBar();
+  updateCharUI();
+  updateFruitInfo();
+  updateSwordInfo();
+};
+</script>
+</body>
+</html>
